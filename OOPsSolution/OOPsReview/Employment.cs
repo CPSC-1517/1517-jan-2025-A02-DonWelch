@@ -134,7 +134,7 @@ namespace OOPsReview
         public SupervisoryLevel Level
         {
             get { return _Level; }
-            set { _Level = value; }
+            private set { _Level = value; }
         }
 
         //Constructors
@@ -205,11 +205,65 @@ namespace OOPsReview
             // .Today has a time of 00:00:00 AM
             // .Now has a specific time of day 13:05:45 PM
             //by using the .Today.AddDays(1) you cover all times on a specific date
-            if (startdate >= DateTime.Today.AddDays(1))
-            {
-                throw new ArgumentException($"The date of {startdate} is invalid, it is in the future.");
-            }
+            if (CheckDate(startdate))
+                StartDate = startdate;
         }
         //Methods (aka Behaviours)
+
+        //syntax of a general method
+        // accesslevel [override] returndatatype methodname ([list of parameters])
+        // {
+        //     coding block
+        //  }
+
+        // realize that to use a method or any item within your instance you must have the instance
+        //  if you have the instance then you have the data within the instance ALREADY
+        //  THEREFORE, if the data is within the instance you DO NOT need to pass the data into your method
+
+        //we would like to dump the data within the instance to "somewhere"
+        public override string ToString()
+        {
+            //this string is known as a "comma separate value" string (csv)
+            //concern: when the date is used, it could have a , within the data value
+            //solution: IF this is a possibility that a value that is used in creating the string pattern
+            //              could make the pattern invalid, you should explicitly handle how the value should be
+            //              displayed in the string
+            //example Date:  Jan 05, 2025 (due to using StartDate.ToShortDateString())
+            //solution:  specific your own format  StartDate.ToString("MMM dd yyyy")
+
+            //Another solution is to change your delimitator that separates your values to a character
+            //  that is not within your range of possible values
+            //example use a '/'
+            //when you use the .Split(delimitator) method to breakup the string into separate values
+            //  you would use the delimitator '/':  string [] pieces = thestring.Split('/')
+            return $"{Title},{Level},{StartDate.ToString("MMM dd yyyy")},{Years}";
+        }
+
+        //StartDate is private set
+        //Note: when you have a private set, you MAY NEED to duplicate validation in several
+        //      places (constructor AND this method)
+        public void CorrectStartDate(DateTime startdate)
+        {
+            if (CheckDate(startdate))
+                StartDate = startdate;
+        }
+
+        //create a private method to handle duplicate code within a class where the method
+        //  is NOT for use by the outside user
+        //Example: the validation of startdate is in two places
+        //          reduce redundance by making a private method 
+        private bool CheckDate(DateTime value)
+        {
+            if (value >= DateTime.Today.AddDays(1))
+            {
+                throw new ArgumentException($"The date of {value} is invalid, it is in the future.");
+            }
+            return true;
+        }
+
+        public void SetSupervisoryResponsibility(SupervisoryLevel level)
+        {
+            Level = level;
+        }
     }
 }
