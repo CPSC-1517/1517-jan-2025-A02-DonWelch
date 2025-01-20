@@ -56,12 +56,16 @@ namespace UnitTestingForSystem
             //Where - Arrange setup
             string expectedTitle = "SAS Lead";
             SupervisoryLevel expectedLevel = SupervisoryLevel.TeamLeader;
+            //if not time is supplied for a DateTime instance, the time is 00:00:00 AM
             DateTime expectedStartDate = new DateTime(2020, 10, 24);
 
             //if code not in greedy constructor, expectedYears will be 0.0
-            double expectedYears = 0.0;
-            //TimeSpan days = DateTime.Today - expectedStartDate;
-            //double expectedYears = Math.Round((days.Days / 365.2), 1);
+            //double expectedYears = 0.0;
+
+            //this code sets up the number of expected years for the supplied 
+            //  date value and does not need to be alter for running an any date
+            TimeSpan days = DateTime.Today - expectedStartDate;
+            double expectedYears = Math.Round((days.Days / 365.2), 1);
 
             //When - Act execution
             Employment actual = new Employment("  SAS Lead   ", SupervisoryLevel.TeamLeader,
@@ -135,31 +139,31 @@ namespace UnitTestingForSystem
 
         //}
 
-        //[Fact]
-        //public void Set_The_Correct_StartDate()
-        //{
-        //    //Where - Arrange setup
-        //    string Title = "SAS Lead";
-        //    SupervisoryLevel Level = SupervisoryLevel.TeamLeader;
-        //    DateTime StartDate = new DateTime(2020, 10, 24);
-        //    TimeSpan days = DateTime.Today - StartDate;
-        //    double Years = Math.Round((days.Days / 365.2), 1);
-        //    Employment sut = new Employment(Title, Level, StartDate, Years);
-        //    DateTime expectedDate = new DateTime(2019, 10, 24);
+        [Fact]
+        public void Set_The_Correct_StartDate()
+        {
+            //Where - Arrange setup
+            string Title = "SAS Lead";
+            SupervisoryLevel Level = SupervisoryLevel.TeamLeader;
+            DateTime StartDate = new DateTime(2020, 10, 24);
+            TimeSpan days = DateTime.Today - StartDate;
+            double Years = Math.Round((days.Days / 365.2), 1);
+            Employment sut = new Employment(Title, Level, StartDate, Years);
+            DateTime expectedDate = new DateTime(2019, 10, 24);
 
-        //    //add the generation of the years when the date is updated
-        //    //this assumes that this is the most current employment
+            //add the generation of the years when the date is updated
+            //this assumes that this is the most current employment
 
-        //    days = DateTime.Today - expectedDate;
-        //    double expectedyears = Math.Round((days.Days / 365.2), 1);
+            days = DateTime.Today - expectedDate;
+            double expectedyears = Math.Round((days.Days / 365.2), 1);
 
-        //    //When - Act execution
-        //    sut.CorrectStartDate(new DateTime(2019, 10, 24));
+            //When - Act execution
+            sut.CorrectStartDate(new DateTime(2019, 10, 24));
 
-        //    //Then - Assert check
-        //    sut.StartDate.Should().Be(expectedDate);
-        //    sut.Years.Should().Be(expectedyears);
-        //}
+            //Then - Assert check
+            sut.StartDate.Should().Be(expectedDate);
+            sut.Years.Should().Be(expectedyears);
+        }
 
 
         //[Fact]
