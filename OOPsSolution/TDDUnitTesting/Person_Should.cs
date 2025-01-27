@@ -193,10 +193,10 @@ namespace TDDUnitTesting
             Person sut = new Person("Shirley", "Welch", null, null);
 
             //Act
-            sut.FirstName = "Bob";
+            sut.LastName = "Ujest";
 
             //Assert
-            sut.FirstName.Should().Be(expectedLastName);
+            sut.LastName.Should().Be(expectedLastName);
         }
         //directly change Address (with new address or null)
         //consider making EmploymentPositions private set (must use method)
@@ -204,6 +204,27 @@ namespace TDDUnitTesting
         #endregion
         #region Exception Tests
         //check firstname has data (ArgumentNUllException)
+        //possible values for parameter: null, empty string, blank string
+        //we have 3 possible tests for the same property
+        //solution:
+        //a) write 3 separate tests that will be the same except for the value being tested
+        //b) write one test that allows for the tested value to be altered
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("      ")]
+        public void Throw_Exception_Directly_Changing_FirstName_Via_Property_Missing_Data(string testvalue)
+        {
+            //Arrange
+            Person sut = new Person("Lowan","Behold",null,null);
+
+            //Act
+            Action action = () => sut.FirstName = testvalue;
+
+            //Assert
+            action.Should().Throw<ArgumentNullException>();
+        }
+
         //check lastname has data (ArgumentNUllException)
         #endregion
         #endregion
