@@ -199,8 +199,61 @@ namespace TDDUnitTesting
             sut.LastName.Should().Be(expectedLastName);
         }
         //directly change Address (with new address or null)
+        [Fact]
+        public void Change_Their_Address_Via_Property()
+        {
+            //Arrange
+            ResidentAddress expectedAddress = new ResidentAddress(321,"Ash Lane","Edmonton","AB","T5R4E3");
+            //Person sut = new Person();
+            Person sut = new Person("Shirley", "Ujest",
+                new ResidentAddress(333, "Maple St.", "Edmonton", "AB", "T6Y7U8"), null);
+
+            //Act
+            sut.Address = new ResidentAddress(321, "Ash Lane", "Edmonton", "AB", "T5R4E3");
+
+            //Assert
+            sut.Address.Should().Be(expectedAddress);
+        }
+        [Fact]
+        public void Change_Their_Address_Via_Property_To_Be_Empty()
+        {
+            //Arrange
+         
+            //Person sut = new Person();
+            Person sut = new Person("Shirley", "Ujest",
+                new ResidentAddress(333, "Maple St.", "Edmonton", "AB", "T6Y7U8"), null);
+
+            //Act
+            sut.Address = null;
+
+            //Assert
+            sut.Address.Should().BeNull();
+        }
         //consider making EmploymentPositions private set (must use method)
+        //  do we wish to allow the entire employment collection to be replaced?
+        //  consider, is the mutator set to private?
+        //      if so, direct altering is not possible (access trouble)
+        //      if private, any code to actually attempt to use the mutator (set) will NOT even compile
+        //  so even though you my have "brainstormed" this test, it is possible to determind that
+        //      the test is unnecessary
+
         //full name should return the name using the current instance data (last, first)
+        [Fact]
+        public void Retreive_The_Full_Name_Via_Property()
+        {
+            //Arrange
+
+            string expectedFullName = "Ujest, Shirley";
+            Person sut = new Person("Shirley", "Ujest",null, null);
+
+            //Act
+            string fullname = sut.FullName;
+
+            //Assert
+            fullname.Should().Be(expectedFullName);
+           // sut.FullName.Should().Be(expectedFullName); //combine act and assert
+        }
+
         #endregion
         #region Exception Tests
         //check firstname has data (ArgumentNUllException)
@@ -226,13 +279,33 @@ namespace TDDUnitTesting
         }
 
         //check lastname has data (ArgumentNUllException)
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("      ")]
+        public void Throw_Exception_Directly_Changing_LastName_Via_Property_Missing_Data(string testvalue)
+        {
+            //Arrange
+            Person sut = new Person("Lowan", "Behold", null, null);
+
+            //Act
+            Action action = () => sut.LastName = testvalue;
+
+            //Assert
+            action.Should().Throw<ArgumentNullException>();
+        }
         #endregion
         #endregion
 
         #region Methods
         #region Successful Tests
+        //ability to add an new employment instance to the collection
+        //ability to change the person's fullname at one time
         #endregion
         #region Exception Tests
+        //changing person"s name:missing data
+        //add new employment: missing data
+        //add new employment : duplicate employment instance
         #endregion
         #endregion
     }

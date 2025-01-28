@@ -8,11 +8,35 @@ namespace OOPsReview
 {
     public class Person
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        private string _FirstName;
+        private string _LastName;
+
+        public string FirstName
+        {
+            get { return _FirstName; }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentNullException("First Name", "First Name is required. Cannot be empty.");
+                _FirstName = value.Trim();
+            }
+        }
+        public string LastName
+        {
+            get { return _LastName; }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentNullException("Last Name", "Last Name is required. Cannot be empty.");
+                _LastName = value.Trim();
+            }
+        }
 
         public ResidentAddress Address { get; set; }
-        public List<Employment> EmploymentPositions { get; set; }
+        public List<Employment> EmploymentPositions { get; private set; }
+
+        //public string FullName { get { return LastName + ", " + FirstName; } }
+        public string FullName => LastName + ", " + FirstName;
 
         public Person()
         {
@@ -24,10 +48,7 @@ namespace OOPsReview
         public Person(string firstname, string lastname, ResidentAddress address,
                         List<Employment> employments)
         {
-            if (string.IsNullOrWhiteSpace(firstname))
-                throw new ArgumentNullException("First Name", "First Name is missing. Data required.");
-            if (string.IsNullOrWhiteSpace(lastname))
-                throw new ArgumentNullException("Last Name", "Last Name is missing. Data required."); 
+           
             FirstName = firstname;
             LastName = lastname;
             Address = address;
@@ -35,6 +56,16 @@ namespace OOPsReview
                 EmploymentPositions = employments;
             else
                 EmploymentPositions = new List<Employment>();
+        }
+
+        public void AddEmployment(Employment employment)
+        {
+
+        }
+
+        public void ChangeFullName(string firstname, string lastname)
+        {
+           
         }
     }
 }
