@@ -300,7 +300,63 @@ namespace TDDUnitTesting
         #region Methods
         #region Successful Tests
         //ability to add an new employment instance to the collection
+        [Fact]
+        public void Add_New_Employment_To_Collection()
+        {
+            //Arrange
+
+            ResidentAddress address = new ResidentAddress(123, "Maple St.",
+                                    "Edmonton", "AB", "T6Y7U8");
+
+            Employment one = new Employment("PG I", SupervisoryLevel.TeamMember,
+                            DateTime.Parse("2013/10/04"), 6.5);
+            TimeSpan days = DateTime.Today.AddDays(-1) - DateTime.Parse("2020/04/04");
+            double years = Math.Round(days.Days / 365.2, 1);
+            Employment two = new Employment("PG II", SupervisoryLevel.TeamMember,
+                            DateTime.Parse("2020/04/04"), years);
+            List<Employment> employments = new(); //in .Net Core, one does not need to
+                                                  //    specific the constructor of your class
+                                                  //    on the new command as the system assumes
+                                                  //    it is of the same datatype as the
+                                                  //    declaration
+            employments.Add(one);
+            employments.Add(two);
+            Person sut = new Person("Don", "Welch", address, employments);
+
+            //setup the changes that will occur
+            //during collection testing (if the collection has orignal items) you WILL need to
+            //  setup a separate second collection to test against
+
+            List<Employment> expectedEmployment = new List<Employment>();
+            expectedEmployment.Add(one);
+            expectedEmployment.Add(two);
+            Employment three = new Employment("Sup I", SupervisoryLevel.Supervisor,
+                           DateTime.Today, 0.0);
+
+            int expectedEmploymentPositionCount = 3;
+
+            //Act
+            sut.AddEmployment(three);
+
+            //Assert
+            sut.EmploymentPositions.Count.Should().Be(expectedEmploymentPositionCount);
+            sut.EmploymentPositions.Should().ContainInConsecutiveOrder(expectedEmployment);
+        }
         //ability to change the person's fullname at one time
+        [Fact]
+        public void Change_FullName()
+        {
+            //Arrange
+            Person sut = new Person();
+            string fullname = "Ujest, Shirley";
+
+            //Act
+            sut.ChangeFullName("Shirley", "Ujest");
+
+            //Assert
+            sut.FullName.Should().Be(fullname);
+        }
+
         #endregion
         #region Exception Tests
         //changing person"s name:missing data
