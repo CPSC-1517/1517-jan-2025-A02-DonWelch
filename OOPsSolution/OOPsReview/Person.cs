@@ -60,6 +60,8 @@ namespace OOPsReview
 
         public void AddEmployment(Employment employment)
         {
+            if (employment == null)
+                throw new ArgumentNullException("Employment required, missing employment data. Unable to add employment history.");
             EmploymentPositions.Add(employment);
         }
 

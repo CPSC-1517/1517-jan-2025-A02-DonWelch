@@ -360,8 +360,51 @@ namespace TDDUnitTesting
         #endregion
         #region Exception Tests
         //changing person"s name:missing data
+        [Theory]
+        [InlineData(null,"Stew-Dent")]
+        [InlineData("","Stew-Dent")]
+        [InlineData("      ","Stew-Dent")]
+        [InlineData("Ima",null)]
+        [InlineData("Ima", "")]
+        [InlineData("Ima", "    ")]
+        public void Throw_Exception_Changing_FullName_With_Missing_Data(string firstname, string lastname)
+        {
+            //Arrange
+            Person sut = new Person("Lowan", "Behold", null, null);
+
+            //Act
+            Action action = () =>  sut.ChangeFullName(firstname, lastname); 
+                                   
+
+            //Assert
+            //one can test the contents of the error message being thrown
+            //this isdone using the .WithMessage(string)
+            //a substring of the error message can be checked using *.....* for the string
+            //one can use string interpolation wiht the creation of your test string
+            action.Should()
+                    .Throw<ArgumentNullException>()
+                    .WithMessage("*is required*");
+        }
+
         //add new employment: missing data
+        [Fact]
+        public void Throw_Exception_Adding_Employment_History_With_Missing_Data()
+        {
+            //Arrange
+            Person sut = new Person("Lowan", "Behold", null, null);
+
+            //Act
+            Action action = () => sut.AddEmployment(null);
+
+
+            //Assert
+           
+            action.Should()
+                    .Throw<ArgumentNullException>()
+                    .WithMessage("*missing employment data*");
+        }
         //add new employment : duplicate employment instance
+
         #endregion
         #endregion
     }
