@@ -1,6 +1,7 @@
 using OOPsReview;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using System.Net;
 
 namespace TDDUnitTesting
 {
@@ -404,7 +405,39 @@ namespace TDDUnitTesting
                     .WithMessage("*missing employment data*");
         }
         //add new employment : duplicate employment instance
+        [Fact]
+        public void Throw_Exception_When_Adding_Duplicate_Employment_History()
+        {
+            //Arrange
+            ResidentAddress address = new ResidentAddress(123, "Maple St.",
+                                    "Edmonton", "AB", "T6Y7U8");
 
+            Employment one = new Employment("PG I", SupervisoryLevel.TeamMember,
+                            DateTime.Parse("2013/10/04"), 6.5);
+            TimeSpan days = DateTime.Today.AddDays(-1) - DateTime.Parse("2020/04/04");
+            double years = Math.Round(days.Days / 365.2, 1);
+            Employment two = new Employment("PG II", SupervisoryLevel.TeamMember,
+                            DateTime.Parse("2020/04/04"), years);
+            Employment three = new Employment("Sup I", SupervisoryLevel.Supervisor,
+                          DateTime.Today, 0.0);
+            List<Employment> employments = new(); //in .Net Core, one does not need to
+                                                  //    specific the constructor of your class
+                                                  //    on the new command as the system assumes
+                                                  //    it is of the same datatype as the
+                                                  //    declaration
+            employments.Add(one);
+            employments.Add(two);
+            employments.Add(three);
+            Person sut = new Person("Don", "Welch", address, employments);
+
+            //Act
+            Action action = () => sut.AddEmployment(three);
+
+            //Assert
+            action.Should()
+                    .Throw<ArgumentException>()
+                    .WithMessage($"*{three.Title} on {three.StartDate}*");
+        }
         #endregion
         #endregion
     }
