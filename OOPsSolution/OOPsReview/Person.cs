@@ -18,6 +18,7 @@ namespace OOPsReview
             {
                 if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentNullException("First Name", "First Name is required. Cannot be empty.");
+                
                 _FirstName = value.Trim();
             }
         }
@@ -60,6 +61,12 @@ namespace OOPsReview
 
         public void AddEmployment(Employment employment)
         {
+            if (employment == null)
+                throw new ArgumentNullException("Employment required, missing employment data. Unable to add employment history.");
+            if (EmploymentPositions.Any(ep => ep.Title.Equals(employment.Title)
+                                          && ep.StartDate == employment.StartDate))
+                throw new ArgumentException("Duplicate Employment",
+                    $"Employment record with position {employment.Title} on {employment.StartDate}");
             EmploymentPositions.Add(employment);
         }
 

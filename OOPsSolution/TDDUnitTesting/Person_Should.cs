@@ -1,6 +1,7 @@
 using OOPsReview;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using System.Net;
 
 namespace TDDUnitTesting
 {
@@ -360,8 +361,83 @@ namespace TDDUnitTesting
         #endregion
         #region Exception Tests
         //changing person"s name:missing data
+        [Theory]
+        [InlineData(null,"Stew-Dent")]
+        [InlineData("","Stew-Dent")]
+        [InlineData("      ","Stew-Dent")]
+        [InlineData("Ima",null)]
+        [InlineData("Ima", "")]
+        [InlineData("Ima", "    ")]
+        public void Throw_Exception_Changing_FullName_With_Missing_Data(string firstname, string lastname)
+        {
+            //Arrange
+            Person sut = new Person("Lowan", "Behold", null, null);
+
+            //Act
+            Action action = () =>  sut.ChangeFullName(firstname, lastname); 
+                                   
+
+            //Assert
+            //one can test the contents of the error message being thrown
+            //this isdone using the .WithMessage(string)
+            //a substring of the error message can be checked using *.....* for the string
+            //one can use string interpolation wiht the creation of your test string
+            action.Should()
+                    .Throw<ArgumentNullException>()
+                    .WithMessage("*is required*");
+        }
+
         //add new employment: missing data
+        [Fact]
+        public void Throw_Exception_Adding_Employment_History_With_Missing_Data()
+        {
+            //Arrange
+            Person sut = new Person("Lowan", "Behold", null, null);
+
+            //Act
+            Action action = () => sut.AddEmployment(null);
+
+
+            //Assert
+           
+            action.Should()
+                    .Throw<ArgumentNullException>()
+                    .WithMessage("*missing employment data*");
+        }
         //add new employment : duplicate employment instance
+        [Fact]
+        public void Throw_Exception_When_Adding_Duplicate_Employment_History()
+        {
+            //Arrange
+            ResidentAddress address = new ResidentAddress(123, "Maple St.",
+                                    "Edmonton", "AB", "T6Y7U8");
+
+            Employment one = new Employment("PG I", SupervisoryLevel.TeamMember,
+                            DateTime.Parse("2013/10/04"), 6.5);
+            TimeSpan days = DateTime.Today.AddDays(-1) - DateTime.Parse("2020/04/04");
+            double years = Math.Round(days.Days / 365.2, 1);
+            Employment two = new Employment("PG II", SupervisoryLevel.TeamMember,
+                            DateTime.Parse("2020/04/04"), years);
+            Employment three = new Employment("Sup I", SupervisoryLevel.Supervisor,
+                          DateTime.Today, 0.0);
+            List<Employment> employments = new(); //in .Net Core, one does not need to
+                                                  //    specific the constructor of your class
+                                                  //    on the new command as the system assumes
+                                                  //    it is of the same datatype as the
+                                                  //    declaration
+            employments.Add(one);
+            employments.Add(two);
+            employments.Add(three);
+            Person sut = new Person("Don", "Welch", address, employments);
+
+            //Act
+            Action action = () => sut.AddEmployment(three);
+
+            //Assert
+            action.Should()
+                    .Throw<ArgumentException>()
+                    .WithMessage($"*{three.Title} on {three.StartDate}*");
+        }
         #endregion
         #endregion
     }
