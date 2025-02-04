@@ -4,4 +4,34 @@
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<!--
+    lets create a two column content area
+    - the left column will hold an image
+    - the right column will hold some text
+
+    we will use bootstrap and div tags to split the content area
+
+    the class row indicates an area that spans to content area with 12 equal compartments
+    you can have several row classes within a single content area
+    these rows can be stack or the can be nested
+
+    the class col-ss-nn where ss is the compartment size and nn is a value between 01-12
+    sizes: xs sm md or lg
+    nn: represents the number of compartments you wish to "merge"
+-->
+
+<div class="row">
+    <div class="col-md-4">
+        <img src="./img/WestWind.png" alt="WestWind image" />
+    </div>
+    <div class="col-md-7">
+        <p>Welcome to your new app.</p>
+        <p>Within this app, you will learn about the basics of Blazor pages. You will
+            create your own pages and fill them with various content. You will learn
+            about event processing, handling of forms and displaying of data. You will
+            investigae the abilitiy to read and write to a csv file. You will use a
+            class to describe your file content.
+        </p>
+    </div>
+</div>
+
