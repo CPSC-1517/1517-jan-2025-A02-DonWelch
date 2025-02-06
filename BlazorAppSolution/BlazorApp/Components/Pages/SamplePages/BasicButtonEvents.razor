@@ -60,8 +60,21 @@
     * vaiables tied to a control are created within the coding block
     * data is automatically moved between the control and the variable
     */
-    private string WelcomeMsg = "Let us get started";
+    private string WelcomeMsg = "";
     private string inputValue = "";
+
+    //there are special events already created for the blazor component
+    // one is the ability to execute code as the page is 1st created
+    // the OnInitialized() method, is executed when the page is 1st created,
+    //      IT DOES NOT EXECUTE AGAIN IF YOU REMAIN ON THE PAGE!!!
+    // it can be used to place special messages on the appearence of a page
+    //  or  initialize  variables on your page
+
+    protected override void OnInitialized()
+    {
+        WelcomeMsg = "Let us get started";
+        base.OnInitialized(); //Personally I do not remove this statement
+    }
 
     private void OnClear()
     {
@@ -70,6 +83,46 @@
 
     private void OnFlip()
     {
-        
+        //this event will play the game heads (0) or tails (1)
+        //the event will generate a random heads or tails value
+        //  to compare to the entered value
+        //display the results in the WelcomeMsg string.
+
+        WelcomeMsg = ""; //empty out any old message 
+                         //create random flip
+        Random rnd = new Random();
+        int flip = rnd.Next(0, 2); //generate a value of 0 or 1
+        if (inputValue.ToUpper().Trim().Equals("H") ||
+            inputValue.ToUpper().Trim().Equals("T"))
+        {
+            if (flip == 0)
+            {
+                //heads
+                if (inputValue.ToUpper().Trim().Equals("H"))
+                {
+                    WelcomeMsg = "You guessed the computer flip. You win.";
+                }
+                else
+                {
+                    WelcomeMsg = "You did not guessed the computer flip. You lose.";
+                }
+            }
+            else
+            {
+                //tails
+                if (inputValue.ToUpper().Trim().Equals("T"))
+                {
+                    WelcomeMsg = "You guessed the computer flip. You win.";
+                }
+                else
+                {
+                    WelcomeMsg = "You did not guessed the computer flip. You lose.";
+                }
+            }
+        }
+        else
+        {
+            WelcomeMsg = "You did not enter an H or T";
+        }
     }
 }
