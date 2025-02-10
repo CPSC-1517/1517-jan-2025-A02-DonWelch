@@ -141,7 +141,7 @@
             <!-- we wish to select from a set of defined choices
                 this will limit the user to ONLY acceptable values
             -->
-            <select id="level" @bind="empLevel" >
+            <select id="level" @bind="empLevel">
                 <!-- the user must choice a supervisory level, therefore
                     there is no need for a prompt line on this select
                 -->
@@ -151,7 +151,7 @@
                     you can also access the Enum definition and
                         extract each enum value (treating the Enum as a collection)
                 -->
-                @foreach(var item in Enum.GetValues(typeof(SupervisoryLevel)))
+                @foreach (var item in Enum.GetValues(typeof(SupervisoryLevel)))
                 {
                     //each Enum will consider the value as a string
                     //the value attribute is the value returned when a choice has been made
@@ -159,6 +159,28 @@
                     <option value="@item">@item</option>
                 }
             </select>
+
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+        <div class="col-md-2">
+            <label for="levelR">Supervisory Level</label>
+        </div>
+        <div class="col-md-2">
+            <!-- we wish to select from a set of defined choices
+                this will limit the user to ONLY acceptable values
+            -->
+            <InputRadioGroup Name="supervisoryradio" id="levelR" @bind-Value="empLevelRadio">
+               
+                @foreach (var item in Enum.GetValues(typeof(SupervisoryLevel)).Cast<SupervisoryLevel>())
+                {
+                    <InputRadio Name="supervisoryradio" Value="@item" /> @item.ToString()<br>
+                }
+            </InputRadioGroup>
+
         </div>
     </div>
     <br/>
@@ -193,7 +215,7 @@
     private DateTime empStartDate;
     private SupervisoryLevel empLevel; //this is a datatype under a different namespace
                                        //when this happen you need to include the missing namespace
-
+    private SupervisoryLevel empLevelRadio; // { get; set; } 
     protected override void OnInitialized()
     {
         // feedBackMsg = "demo of success message";
