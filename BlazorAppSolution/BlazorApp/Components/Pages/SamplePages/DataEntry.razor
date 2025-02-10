@@ -1,0 +1,99 @@
+﻿@page "/dataentry"
+<PageTitle>Data Entry</PageTitle>
+@rendermode InteractiveServer
+
+
+<h1>Data Entry</h1>
+<h4>Employment data collection</h4>
+
+@*
+    we wish to add a blockquote but center the control on the page
+    to do so, we will use bootstrap formating with rows/columns
+*@
+<div class="row">
+    <div class="offset-1 col-md-10">
+        <blockquote style="background-color:gainsboro;">
+            <p>
+                This component will demonstrate how your page can handle validation of data input,
+                showing validation messages when you have a number of controls for data entry. This
+                component will validate the locate controls and create any validation messages for
+                invalid data. The messages can be collected using various techniques such as: List or
+                Dictionary.
+            </p>
+            <p>
+                This page will input data for an instance of the Employment class. This demo will
+                use the Employment class from the OOPs review. The SupervisoryLevel enum
+                class will also be brought into this project. One could have included the entire
+                class library as part of this solution instead of bringing in individual classes.
+            </p>
+        </blockquote>
+    </div>
+</div>
+
+@*
+    feedback area
+        success messages
+        error messages
+*@
+
+<!--
+    Success area
+    check if there is a feedback message, if so display it
+
+    also could use: if(feedBackMsg.Length > 0)
+-->
+@if(!string.IsNullOrWhiteSpace(feedBackMsg))
+{
+    <div class="alert alert-success">
+        <p>@feedBackMsg</p>
+    </div>
+}
+
+<!--
+    Error Message area
+    check if there are any error messages, if so display them
+-->
+@if(errorMsgs.Count > 0)
+{
+    <div class="alert alert-danger">
+        <p>Please fix the following issues:</p>
+        <ul>
+            @foreach(var error in errorMsgs)
+            {
+                <!--
+                    due to the structure of a Dictionary entry
+                    there are two components: key and value
+                    Here we wish to just use the value
+
+                    If this was a List collection there is only
+                    one component, the string
+                    therfore you would NOT need the .Value
+                -->
+                <li>@error.Value</li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    private string feedBackMsg = "";
+
+    //could be using a List<string> as well as this Dictionary
+    //private List<string> errormsgs = new ();
+
+    //the Dictionary has a structure of 2 values: TKey (acts like a primary key)
+    //                                            TValue which is the string associated with the key
+    //one could search the dictionary on the TKey value and retreive the TValue string
+    //NOTE: the TKey value MUST be unique within the entries of the Dictionary
+
+    Dictionary<string, string> errorMsgs = new();
+
+    protected override void OnInitialized()
+    {
+        // feedBackMsg = "demo of success message";
+        // errorMsgs.Add("1", "first error message");
+        // errorMsgs.Add("2", "second error message");
+        // errorMsgs.Add("3", "third error message");
+        base.OnInitialized();
+    }
+}
