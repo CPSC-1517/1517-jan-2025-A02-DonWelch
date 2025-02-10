@@ -2,6 +2,8 @@
 <PageTitle>Data Entry</PageTitle>
 @rendermode InteractiveServer
 
+<!-- this namespace is needed because we are using classes from the OOPsReview namespace-->
+@using OOPsReview; 
 
 <h1>Data Entry</h1>
 <h4>Employment data collection</h4>
@@ -75,6 +77,103 @@
     </div>
 }
 
+<!--
+    form area
+    standard html controls
+    use bootstrap for formating
+    each control will be on a separate row
+    each row is stack top to bottom
+-->
+<fieldset>
+    <legend>Employment Data</legend>
+    <!--
+        the structure of a row will contain 2 columns
+        1) will contain the label for the data entry
+        2) will contain the input control for the data entry
+    -->
+    <div class="row">
+        <div class="col-md-2">
+            <label for="title">Position Title</label>
+        </div>
+        <div class="col-md-2">
+            <input type="text" id="title" @bind="empTitle"
+                placeholder="enter position" />
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label for="years">Years in Position</label>
+        </div>
+        <div class="col-md-2">
+            <!-- restrict the data type for this control to allow ONLY numbers
+                 the step attribute allows the control's spinner to increment by 
+                        a select interval, default is 1
+            -->
+            <input type="number" id="years" @bind="empYears"
+                   placeholder="eg: 3.4"
+                   style="width:75px;"
+                   step="0.1"/>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+        <div class="col-md-2">
+            <label for="startdate">Start Date</label>
+        </div>
+        <div class="col-md-2">
+            <!-- restrict the data type for this control to allow ONLY dates-->
+            <input type="date" id="startdate" @bind="empStartDate" />
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+        <div class="col-md-2">
+            <label for="level">Supervisory Level</label>
+        </div>
+        <div class="col-md-2">
+            <!-- we wish to select from a set of defined choices
+                this will limit the user to ONLY acceptable values
+            -->
+            <select id="level" @bind="empLevel" >
+                <!-- the user must choice a supervisory level, therefore
+                    there is no need for a prompt line on this select
+                -->
+                <!--
+                    there is a line for each item in the Enum
+                    you could hard-code each option tag
+                    you can also access the Enum definition and
+                        extract each enum value (treating the Enum as a collection)
+                -->
+                @foreach(var item in Enum.GetValues(typeof(SupervisoryLevel)))
+                {
+                    //each Enum will consider the value as a string
+                    //the value attribute is the value returned when a choice has been made
+                    //the string between the opening and closing tag will be displayed to the user
+                    <option value="@item">@item</option>
+                }
+            </select>
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-outline-primary rounded-pill"
+                    @onclick="OnCollect"> Submit</button>
+            &nbsp;&nbsp;
+            <button type="submit" class="btn btn-outline-secondary rounded-pill"
+                    @onclick="OnClear">
+                Clear
+            </button>
+        </div>
+    </div>
+</fieldset>
 @code {
     private string feedBackMsg = "";
 
@@ -88,12 +187,32 @@
 
     Dictionary<string, string> errorMsgs = new();
 
+    //Employment input field variables
+    private string empTitle = "";
+    private double empYears = 0.0;
+    private DateTime empStartDate;
+    private SupervisoryLevel empLevel; //this is a datatype under a different namespace
+                                       //when this happen you need to include the missing namespace
+
     protected override void OnInitialized()
     {
         // feedBackMsg = "demo of success message";
         // errorMsgs.Add("1", "first error message");
         // errorMsgs.Add("2", "second error message");
         // errorMsgs.Add("3", "third error message");
+
+        //initialize the Start Date to today
+        empStartDate = DateTime.Today;
         base.OnInitialized();
+    }
+
+    private void OnCollect()
+    {
+        feedBackMsg = "inside collect";
+    }
+
+    private void OnClear()
+    {
+        feedBackMsg = "inside clear";
     }
 }
