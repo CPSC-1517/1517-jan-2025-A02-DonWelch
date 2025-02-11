@@ -135,19 +135,28 @@
 
     <div class="row">
         <div class="col-md-2">
-            <label for="level">Supervisory Level</label>
+            <label for="levelS">Supervisory Level</label>
         </div>
         <div class="col-md-2">
             <!-- we wish to select from a set of defined choices
                 this will limit the user to ONLY acceptable values
             -->
-            <select id="level" @bind="empLevel">
+            <select id="levelS" @bind="empLevelS">
                 <!-- the user must choice a supervisory level, therefore
                     there is no need for a prompt line on this select
-                -->
+                 -->
                 <!--
                     there is a line for each item in the Enum
                     you could hard-code each option tag
+
+                     <option value="Entry">Entry</option>
+                     <option value="TeamMember">TeamMember</option>
+                     <option value="TeamLeader">TeamLeader</option>
+                     <option value="Supervisory">Supervisory</option>
+                     <option value="DepartmentHead">DepartmentHead</option>
+                     <option value="Owner">Owner</option>
+                -->
+                <!--
                     you can also access the Enum definition and
                         extract each enum value (treating the Enum as a collection)
                 -->
@@ -172,17 +181,23 @@
         <div class="col-md-2">
             <!-- we wish to select from a set of defined choices
                 this will limit the user to ONLY acceptable values
+
+                this control is not a standard html input control
+                this control is a Blazor control
+                this control needs to use bind-value instead of just bind
             -->
-            <InputRadioGroup Name="supervisoryradio" id="levelR" @bind-Value="empLevelRadio">
+            <InputRadioGroup Name="supervisoryradio" id="levelR" @bind-Value="empLevelR">
                
                 @foreach (var item in Enum.GetValues(typeof(SupervisoryLevel)).Cast<SupervisoryLevel>())
                 {
-                    <InputRadio Name="supervisoryradio" Value="@item" /> @item.ToString()<br>
+                   
+                    <InputRadio Name="supervisoryradio" Value="@item" /> @item.ToString() <br/>
                 }
             </InputRadioGroup>
 
         </div>
     </div>
+    
     <br/>
     <div class="row">
         <div class="col-md-12 text-center">
@@ -213,9 +228,9 @@
     private string empTitle = "";
     private double empYears = 0.0;
     private DateTime empStartDate;
-    private SupervisoryLevel empLevel; //this is a datatype under a different namespace
-                                       //when this happen you need to include the missing namespace
-    private SupervisoryLevel empLevelRadio; // { get; set; } 
+    private SupervisoryLevel empLevelS; //this is a datatype under a different namespace
+                                        //when this happen you need to include the missing namespace
+    private SupervisoryLevel empLevelR; // { get; set; } 
     protected override void OnInitialized()
     {
         // feedBackMsg = "demo of success message";
@@ -230,11 +245,55 @@
 
     private void OnCollect()
     {
-        feedBackMsg = "inside collect";
+        //clear out any old messages
+        feedBackMsg = "";
+        errorMsgs.Clear();
+
+        //primitive validation
+        //  presence
+        //  datatype/pattern
+        //  range of values
+
+        //Business Rules (aka your validation requirements)
+        //title must be presence, must have at least one character
+        //start date cannot be in the future
+        //years cannot be less than zero
+
+        if(string.IsNullOrWhiteSpace(empTitle))
+        {
+            errorMsgs.Add("Title", "Title is required");
+        }
+
+        if(empYears < 0)
+        {
+            errorMsgs.Add("Years", "Years cannot be negative");
+        }
+
+        if(empStartDate >= DateTime.Today.AddDays(1))
+        {
+            errorMsgs.Add("Date", "Start Date cannot be in the future");
+        }
+
+        if(errorMsgs.Count == 0)
+        {
+            //data is assumed to be valid
+            feedBackMsg = $"{empTitle} {empYears} {empStartDate} {empLevelS} {empLevelR}";
+
+        }
+
     }
 
     private void OnClear()
     {
-        feedBackMsg = "inside clear";
+        //clear out any old messages
+        feedBackMsg = "";
+        errorMsgs.Clear();
+
+        //reset the input controls to the opening page defaults
+        empTitle = "";
+        empYears = 0.0;
+        empStartDate = DateTime.Today;
+        empLevelR = SupervisoryLevel.Entry;
+        empLevelS = SupervisoryLevel.Entry;
     }
 }
