@@ -39,10 +39,10 @@
 *@
 
 <!--
-    Success area
-    check if there is a feedback message, if so display it
+Success area
+check if there is a feedback message, if so display it
 
-    also could use: if(feedBackMsg.Length > 0)
+also could use: if(feedBackMsg.Length > 0)
 -->
 @if(!string.IsNullOrWhiteSpace(feedBackMsg))
 {
@@ -52,8 +52,8 @@
 }
 
 <!--
-    Error Message area
-    check if there are any error messages, if so display them
+Error Message area
+check if there are any error messages, if so display them
 -->
 @if(errorMsgs.Count > 0)
 {
@@ -63,13 +63,13 @@
             @foreach(var error in errorMsgs)
             {
                 <!--
-                    due to the structure of a Dictionary entry
-                    there are two components: key and value
-                    Here we wish to just use the value
+                due to the structure of a Dictionary entry
+                there are two components: key and value
+                Here we wish to just use the value
 
-                    If this was a List collection there is only
-                    one component, the string
-                    therfore you would NOT need the .Value
+                If this was a List collection there is only
+                one component, the string
+                therfore you would NOT need the .Value
                 -->
                 <li>@error.Value</li>
             }
@@ -78,18 +78,18 @@
 }
 
 <!--
-    form area
-    standard html controls
-    use bootstrap for formating
-    each control will be on a separate row
-    each row is stack top to bottom
+form area
+standard html controls
+use bootstrap for formating
+each control will be on a separate row
+each row is stack top to bottom
 -->
 <fieldset>
     <legend>Employment Data</legend>
     <!--
-        the structure of a row will contain 2 columns
-        1) will contain the label for the data entry
-        2) will contain the input control for the data entry
+    the structure of a row will contain 2 columns
+    1) will contain the label for the data entry
+    2) will contain the input control for the data entry
     -->
     <div class="row">
         <div class="col-md-2">
@@ -97,7 +97,7 @@
         </div>
         <div class="col-md-2">
             <input type="text" id="title" @bind="empTitle"
-                placeholder="enter position" />
+            placeholder="enter position" />
         </div>
     </div>
 
@@ -109,13 +109,13 @@
         </div>
         <div class="col-md-2">
             <!-- restrict the data type for this control to allow ONLY numbers
-                 the step attribute allows the control's spinner to increment by 
-                        a select interval, default is 1
+            the step attribute allows the control's spinner to increment by 
+            a select interval, default is 1
             -->
             <input type="number" id="years" @bind="empYears"
-                   placeholder="eg: 3.4"
-                   style="width:75px;"
-                   step="0.1"/>
+            placeholder="eg: 3.4"
+            style="width:75px;"
+            step="0.1"/>
         </div>
     </div>
 
@@ -139,26 +139,26 @@
         </div>
         <div class="col-md-2">
             <!-- we wish to select from a set of defined choices
-                this will limit the user to ONLY acceptable values
+            this will limit the user to ONLY acceptable values
             -->
             <select id="levelS" @bind="empLevelS">
                 <!-- the user must choice a supervisory level, therefore
-                    there is no need for a prompt line on this select
-                 -->
-                <!--
-                    there is a line for each item in the Enum
-                    you could hard-code each option tag
-
-                     <option value="Entry">Entry</option>
-                     <option value="TeamMember">TeamMember</option>
-                     <option value="TeamLeader">TeamLeader</option>
-                     <option value="Supervisory">Supervisory</option>
-                     <option value="DepartmentHead">DepartmentHead</option>
-                     <option value="Owner">Owner</option>
+                there is no need for a prompt line on this select
                 -->
                 <!--
-                    you can also access the Enum definition and
-                        extract each enum value (treating the Enum as a collection)
+                there is a line for each item in the Enum
+                you could hard-code each option tag
+
+                <option value="Entry">Entry</option>
+                <option value="TeamMember">TeamMember</option>
+                <option value="TeamLeader">TeamLeader</option>
+                <option value="Supervisory">Supervisory</option>
+                <option value="DepartmentHead">DepartmentHead</option>
+                <option value="Owner">Owner</option>
+                -->
+                <!--
+                you can also access the Enum definition and
+                extract each enum value (treating the Enum as a collection)
                 -->
                 @foreach (var item in Enum.GetValues(typeof(SupervisoryLevel)))
                 {
@@ -180,32 +180,32 @@
         </div>
         <div class="col-md-2">
             <!-- we wish to select from a set of defined choices
-                this will limit the user to ONLY acceptable values
+            this will limit the user to ONLY acceptable values
 
-                this control is not a standard html input control
-                this control is a Blazor control
-                this control needs to use bind-value instead of just bind
+            this control is not a standard html input control
+            this control is a Blazor control
+            this control needs to use bind-value instead of just bind
             -->
             <InputRadioGroup Name="supervisoryradio" id="levelR" @bind-Value="empLevelR">
-               
+
                 @foreach (var item in Enum.GetValues(typeof(SupervisoryLevel)).Cast<SupervisoryLevel>())
                 {
-                   
+
                     <InputRadio Name="supervisoryradio" Value="@item" /> @item.ToString() <br/>
                 }
             </InputRadioGroup>
 
         </div>
     </div>
-    
+
     <br/>
     <div class="row">
         <div class="col-md-12 text-center">
             <button type="submit" class="btn btn-outline-primary rounded-pill"
-                    @onclick="OnCollect"> Submit</button>
+            @onclick="OnCollect"> Submit</button>
             &nbsp;&nbsp;
             <button type="submit" class="btn btn-outline-secondary rounded-pill"
-                    @onclick="OnClear">
+            @onclick="OnClear">
                 Clear
             </button>
         </div>
@@ -229,8 +229,24 @@
     private double empYears = 0.0;
     private DateTime empStartDate;
     private SupervisoryLevel empLevelS; //this is a datatype under a different namespace
-                                        //when this happen you need to include the missing namespace
+    //when this happen you need to include the missing namespace
     private SupervisoryLevel empLevelR; // { get; set; } 
+
+    Employment employment = null;
+
+    //injected services into your application
+    //the declaration needs to be coded as a property, typically an auto-implemented property
+    //WARNING: you may get a exception on the declaration (red line), if so place a using
+    //  clause at the top of this file (using Microsoft.JSInterop;)
+    [Inject]
+    private IJSRuntime jSRuntime { get; set; }
+
+    //this variable is required if you are using property injection
+    //  for services available from the system which are not normally included
+    //  for use to your application
+    [Inject]
+    public IWebHostEnvironment webHostEnvironment{ get; set; }
+
     protected override void OnInitialized()
     {
         // feedBackMsg = "demo of success message";
@@ -241,6 +257,18 @@
         //initialize the Start Date to today
         empStartDate = DateTime.Today;
         base.OnInitialized();
+    }
+
+    private Exception GetInnerException(Exception ex)
+    {
+        //drill down into your Exception until there are no more inner exceptions
+        //at this point you will have the "real" reason for the error
+        while (ex.InnerException != null)
+            ex = ex.InnerException;
+
+        //you now have the real reason for your error (details)
+        //return the details to the call
+        return ex;
     }
 
     private void OnCollect()
@@ -277,23 +305,116 @@
         if(errorMsgs.Count == 0)
         {
             //data is assumed to be valid
-            feedBackMsg = $"{empTitle} {empYears} {empStartDate} {empLevelS} {empLevelR}";
+            //feedBackMsg = $"{empTitle} {empYears} {empStartDate} {empLevelS} {empLevelR}";
 
+            //if you are using a class to collect and hold your data
+            //      you need to be concerned with how the class coding handles
+            //      any errors in creating or processing code within the class
+            //this normally means some type of try/catch processing
+            try
+            {
+                //create an instance of Employment to use to write to the data file
+                //the data file record will use the ToString() of Employment
+                //(Note: you could manually in this method create the concatenated string for
+                //      writing)
+                //Remember if an error occurs while creating your instance, the instance will
+                //  throw an exception; which should be caught by the catches below.
+
+                //empYears = -2; //this is to cause an exception from the class to demonstrate
+                // the try/catch in this code
+                //ONCE TESTED comment out this assignment statement
+                employment = new Employment(empTitle, empLevelS, empStartDate, empYears);
+
+                //write the class data as a string to a csv text file
+                // required:
+                // a) know the location of the file (name)
+                // b) the technique to use in writing to the file
+                //    there are several ways to write to the file
+                //      a) StreamWriter/StreamReader
+                //      b) using the System.IO.File methods
+                //           (handles the streaming of the data)
+
+                //WARNING: when you use the System.IO.File you MUST use the
+                //          fully qualified naming to the class method you wish
+                //          to use.
+                //         you can not get by just using a reference to the
+                //           namespace at the top of your code (using System.IO;)
+
+                //there are a couple of ways to refer to your file and its path
+                //  i) obtain the root path of your application using an injection
+                //      service called IWebHostEnvironment via property injection (see variables)
+                //  ii) use relative addressing starting a the top of your application
+
+                //in this example we will demonstrate property injection
+                //the method that will be use will return the path from the
+                //  top of your drive to the top of your application
+                //append the remainder part of the file path to this result (via concentation)
+
+                //WARNING: the folder slash for your path can be both a forward or back slash
+                //              on a PC BUT for an Apple machine, you must use the forward slash (/)
+                string appPathName = webHostEnvironment.ContentRootPath; //top of your application 
+                string csvFilePathName = $@"{appPathName}/Data/Employment.csv";
+
+                //write the data from the employment instance (ToString) as a line to the csv file
+                //since the string does not contain a line feed character, we will need to concatenate
+                //  the character (\n)
+                //the System.IO.File method will be AppendAllText(filepathname,string)
+                // AppendAllText will
+                //   a) create the file if it does not exist
+                //   b) opens
+                //   c) writes the text
+                //   d) closes
+                string line = $"{employment.ToString()}\n";
+                System.IO.File.AppendAllText(csvFilePathName, line);
+
+                //give the user a feedback message that indicates the success of the operation: writing
+                feedBackMsg ="Your data has been save to file.";
+
+            } 
+            catch (ArgumentNullException ex)
+            {
+                errorMsgs.Add($"Missing Data", GetInnerException(ex).Message);
+
+            }
+            catch (ArgumentException ex)
+            {
+                errorMsgs.Add($"Data value", GetInnerException(ex).Message);
+
+            }
+            catch (Exception ex)
+            {
+                errorMsgs.Add($"System Error", GetInnerException(ex).Message);
+
+            }
+           
         }
 
     }
 
-    private void OnClear()
+    //this method is being done as an async task as it has to wait for the user
+    //  to respond
+    //this async task will need a service called JSRunTime
+    //you will need to inject a service into my code
+    private async Task OnClear()
     {
         //clear out any old messages
         feedBackMsg = "";
-        errorMsgs.Clear();
 
-        //reset the input controls to the opening page defaults
-        empTitle = "";
-        empYears = 0.0;
-        empStartDate = DateTime.Today;
-        empLevelR = SupervisoryLevel.Entry;
-        empLevelS = SupervisoryLevel.Entry;
+        //issue a prompt dialogue to the user to obtain confirmation of the action
+        //create your message for the dialogue box into a generic object
+        object[] messageline = new object[]
+        {"Clearing will lose all unsaved data. Are you sure you wish to continue?"};
+        if (await jSRuntime.InvokeAsync<bool>("confirm", messageline))
+        {
+            //clear only if the user has click OK on the dialogue
+            errorMsgs.Clear();
+
+            //reset the input controls to the opening page defaults
+            empTitle = "";
+            empYears = 0.0;
+            empStartDate = DateTime.Today;
+            empLevelR = SupervisoryLevel.Entry;
+            empLevelS = SupervisoryLevel.Entry;
+        }
     }
 }
