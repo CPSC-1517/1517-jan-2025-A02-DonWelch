@@ -1,0 +1,54 @@
+﻿@page "/report"
+<PageTitle>Tabular Report</PageTitle>
+@rendermode InteractiveServer
+
+<h1>Employment History</h1>
+<h4>using a scrolling Tabular Report</h4>
+
+<div class="row">
+    <div class="offset-1 col-md-10">
+        <blockquote style="background-color:gainsboro;">
+            <p>
+                This component will demonstrate how to create a tabular report. It will demostrate using bootstrap
+                scrolling on your table. The page will demonstrate File I/O reading. The files records will be
+                placed in a collection based on a class definition. The processing will handle: good records, badly
+                format records and an empty file.
+            </p>
+         
+        </blockquote>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(feedBackMsg))
+{
+    <div class="alert alert-success">
+        <p>@feedBackMsg</p>
+    </div>
+}
+
+@if (errorMsgs.Count > 0)
+{
+    <div class="alert alert-danger">
+        <p>Please fix the following issues:</p>
+        <ul>
+            @foreach (var error in errorMsgs)
+            {
+                <!--
+                this is a List collection there is only
+                one component, the string
+                therfore you would NOT need the .Value
+                -->
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    private string feedBackMsg = "";
+
+    //could be using a List<string> as well as this Dictionary
+    private List<string> errorMsgs = new ();
+
+   
+}
