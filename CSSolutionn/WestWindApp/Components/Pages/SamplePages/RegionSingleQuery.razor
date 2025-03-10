@@ -1,0 +1,146 @@
+﻿@page "/singlequery"
+<PageTitle>Single Query</PageTitle>
+@rendermode InteractiveServer
+
+<!-- additional namespaces-->
+@using WestWindSystem.BLL;
+@using WestWindSystem.Entities;
+
+<h1>Region Query</h1>
+<h4>... single record query</h4>
+
+@if (feedbackmsg.Length > 0)
+{
+    <div class="alert alert-info">
+        <p>@feedbackmsg</p>
+    </div>
+}
+
+@if (errormsgs.Count > 0)
+{
+    <div class="alert alert-danger">
+        <p>Please fix the following issues:</p>
+        <ul>
+            @foreach (var error in errormsgs)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+
+<!-- create the form for the query-->
+@*
+    form area
+    standard html controls
+    use bootstrap for formating
+    form will be two column
+*@
+
+<div class="row">
+    <div class="col-md-6">
+        <!-- this column will hold the query input controls and buttons-->
+        <p><strong>Input query values</strong></p>
+        <label for="regionid">Enter a region id:</label>&nbsp;&nbsp;
+        <input id="regionid" type="number" placeholder="enter id"
+        style="width:100px;" @bind="entryarg" />&nbsp;&nbsp;
+        <button type="submit" class="btn btn-outline-secondary rounded-pill"
+        @onclick="GetByID">Fetch By Entry</button>
+        <br/><br/>
+        <label for="regionselect">Select a region:</label>&nbsp;&nbsp;
+        <select id="regionselect" @bind="selectarg" style="width:100px;">
+            <option value="0">... select</option>
+            @foreach(var item in regionList)
+            {
+                <option value="@item.RegionID">@item.RegionDescription</option>
+            }
+        </select>&nbsp;&nbsp;
+        <button type="submit" class="btn btn-outline-secondary rounded-pill"
+        @onclick="GetBySelection">
+            Fetch By Selection
+        </button>
+    </div>
+    <div class="col-md-6">
+        <!-- this column will hold the query result output
+        no output attempt will be done unless the page actaully
+        has something to display
+        -->
+        <p>Results of the query</p>
+        <br/><br/>
+        @if (region != null)
+        {
+            <p>Region ID: @region.RegionID</p><br/>
+            <p>Region Description: @region.RegionDescription</p>
+        }
+    </div>
+</div>
+@code {
+    private string feedbackmsg = "";
+    private List<string> errormsgs = new List<string>();
+
+    //input argument variables
+    private int entryarg = 0;
+    private int selectarg = 0;
+
+    //query result variable
+    private Region region = null;
+
+    //inject services for Region
+    [Inject]
+    private RegionServices _regionServices { get; set; }
+    private List<Region> regionList = new List<Region>(); //cannot be null as the loop in select
+                                                          //     must exist even if empty
+
+    protected override void OnInitialized()
+    {
+        //need this method as the select collection needs to exist as the page
+        //  first appears
+        //consume a Region service
+        regionList = _regionServices.Region_GetAll();
+        base.OnInitialized();
+    }
+
+    private void GetByID()
+    {
+        feedbackmsg ="";
+        errormsgs.Clear();
+        region = null;
+
+        //validate the incoming argument value
+        if (entryarg <= 0)
+        {
+            errormsgs.Add($"Your region id value {entryarg} is invalid. Must be greater than 0");
+        }
+        else
+        {
+            //consume the service
+            region = _regionServices.Region_GetByID(entryarg);
+            if(region == null)
+            {
+                feedbackmsg = $"There is no region by the enter region argument value {entryarg}";
+            }
+        }
+    }
+    private void GetBySelection()
+    {
+        feedbackmsg ="";
+        errormsgs.Clear();
+        region = null;
+
+        //validate the incoming argument value
+        if (selectarg == 0)
+        {
+            errormsgs.Add($"You must select a region to query");
+        }
+        else
+        {
+            //consume the service
+            region = _regionServices.Region_GetByID(selectarg);
+            if (region == null)
+            {
+                feedbackmsg = "There is no data by the selected region";
+            }
+        }
+    }
+}
