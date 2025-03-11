@@ -1,0 +1,146 @@
+﻿@page "/tablequery"
+<PageTitle>Table Query</PageTitle>
+@rendermode InteractiveServer
+
+<!-- additional namespaces-->
+@using WestWindSystem.BLL;
+@using WestWindSystem.Entities;
+
+<h1>Shipment Query (using scrolling)</h1>
+<h4>... non primary key filter search</h4>
+
+@if (feedBackMsg.Length > 0)
+{
+    <div class="alert alert-info">
+        <p>@feedBackMsg</p>
+    </div>
+}
+
+@if (errorMsgs.Count > 0)
+{
+    <div class="alert alert-danger">
+        <p>Please fix the following issues:</p>
+        <ul>
+            @foreach (var error in errorMsgs)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <p><strong>Input query values</strong></p>
+        <label for="year">Enter a year:</label>&nbsp;&nbsp;
+        <input id="year" type="number" placeholder="enter year"
+               style="width:100px;" @bind="yeararg" />
+        <br/><br/>
+        <label for="month">Enter a month:</label>&nbsp;&nbsp;
+        <input id="month" type="number" placeholder="enter month"
+               style="width:100px;" @bind="montharg" />
+        <br /><br />
+        <button type="submit" class="btn btn-outline-secondary rounded-pill"
+                @onclick="GetShipments">
+            Fetch Shipments
+        </button>
+    </div>
+    <div class="col-md-9">
+        @if(shipmentList == null)
+        {
+            <p>Enter desired year and month for search</p>
+        }
+        else
+        {
+            <p><strong>Display of query results</strong></p>
+            if(shipmentList.Count == 0)
+            {
+                <p>No data found for year and month arguments in search</p>
+            }
+            else
+            {
+                <div class="overflow-scroll" style="height:450px;">
+                    <table class="table table-striped">
+                        <thead style="position: sticky; top: 0; background-color:white;">
+                            <tr>
+                                <th>ID</th>
+                                <th>Order</th>
+                                <th>Date</th>
+                                <th>Shipper</th>
+                                <th>Freight $</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in shipmentList)
+                            {
+                                <tr>
+                                    <td>@item.ShipmentID</td>
+                                    <td>@item.OrderID</td>
+                                    <td>@item.ShippedDate.ToShortDateString()</td>
+                                    <td>@item.ShipVia</td>
+                                    <td align="right">@(string.Format("{0:#,##0.00}", item.FreightCharge))</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</div>
+@code {
+    private string feedBackMsg = "";
+    private List<string> errorMsgs = new List<string>();
+
+    //input query arguments
+    private int yeararg = 0;
+    private int montharg = 0;
+
+    //output variable for display
+    private List<Shipment> shipmentList = null;
+
+    //what services are required?
+    [Inject]
+    private ShipmentServices _shipmentServices { get; set; }
+
+    protected override void OnInitialized()
+    {
+        yeararg = DateTime.Today.Year;
+        montharg = DateTime.Today.Month;
+        base.OnInitialized();
+    }
+    private void GetShipments()
+    {
+        feedBackMsg = "";
+        errorMsgs.Clear();
+        shipmentList = null;
+
+        //validate incoming values
+        if(yeararg < 1950 || yeararg > DateTime.Today.AddDays(1).Year)
+        {
+            errorMsgs.Add("Your year value is invalid. Year is between 1950 and today");
+        }
+        if (montharg < 1 || montharg > 12)
+        {
+            errorMsgs.Add("Your month value is invalid. Month is between 1 and 12");
+        }
+
+        if(errorMsgs.Count == 0)
+        {
+            //assume input args are valid
+            //consume service to obtain shipment data
+
+            //since the next statement calls a services which
+            //  in itself could abort, the call NEEDS to be in a try/catch
+            try
+            {
+                shipmentList = _shipmentServices.Shipment_GetByYearAndMonth(yeararg, montharg);
+            }
+            catch(Exception ex)
+            {
+                errorMsgs.Add($"System Error: {ex.Message}");
+            }
+
+        }
+    }
+}
