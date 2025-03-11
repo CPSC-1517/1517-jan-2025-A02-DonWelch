@@ -59,6 +59,29 @@
             }
             else
             {
+                //this example uses the quick and easy technique of scrolling
+                //Note the table is surrounded by a div tag
+                //     on the div tag is 2 parameters
+                //      the class causes the scroll (built into bootstrap)
+                //      the style specifies the height of the display area
+
+                //the shipment record has a field called ShipVia which is foreign key (1, 2, 3, etc)
+                //displaying that is meaningless to someone reading the data unless they were familiar with
+                //      the pkey value associated with each company
+                //solution: display the company name
+                //Problem: the name is in a different table
+
+                //If you look at the entities, records with fields used in sql scheme relationships
+                //      have virtual navigational properties (see bottom of entity)
+                //These properties allow you to have access to data in the related table
+
+                //How to use
+
+                //When you use the property just treat it as the name of an object so accessing the
+                //      desired field in the related table just needs the dot (.) operator
+                //In this example, the property is ShipViaNavigation which points to the Shippers table
+                //      and the desired field from the Shippers table was CompanyName
+
                 <div class="overflow-scroll" style="height:450px;">
                     <table class="table table-striped">
                         <thead style="position: sticky; top: 0; background-color:white;">
@@ -77,7 +100,8 @@
                                     <td>@item.ShipmentID</td>
                                     <td>@item.OrderID</td>
                                     <td>@item.ShippedDate.ToShortDateString()</td>
-                                    <td>@item.ShipVia</td>
+                                   @*  <td>@item.ShipVia</td> *@
+                                    <td>@item.ShipViaNavigation.CompanyName</td>
                                     <td align="right">@(string.Format("{0:#,##0.00}", item.FreightCharge))</td>
                                 </tr>
                             }
@@ -103,8 +127,22 @@
     [Inject]
     private ShipmentServices _shipmentServices { get; set; }
 
+    // [Inject]
+    // private ShipperServices _shipperServices { get; set; }
+    // private List<Shipper> shipperList = null;
+
     protected override void OnInitialized()
     {
+        //there are two techniques to allow the use of navigational properties on your page
+        //      a) bring in a dataset of the table to which you are attempting to navigate
+        //      b) use the .Include method on the query itself (see Shipment query for this technique in BLL ShipmentServices)
+
+        // Technique (a)
+        // this data set is needed to handle the navigation reference used on the table data cell
+        //           to display the shipper company name
+        // no other coding is needed, the system will match up the dataset to the usage in the table above
+        //shipperList = _shipperServices.Shipper_GetAll();
+
         yeararg = DateTime.Today.Year;
         montharg = DateTime.Today.Month;
         base.OnInitialized();
