@@ -50,6 +50,16 @@ namespace WestWindSystem.BLL
         //      the shipment record (child)
         public List<Shipment> Shipment_GetByYearAndMonth(int year, int month)
         {
+            //validate incoming values
+            if (year < 1950 || year > DateTime.Today.AddDays(1).Year)
+            {
+                throw new ArgumentException($"Your year value {year} is invalid. Year is between 1950 and today");
+            }
+            if (month < 1 || month > 12)
+            {
+                throw new ArgumentException($"Your month value {month} is invalid. Month is between 1 and 12");
+            }
+
             IEnumerable<Shipment> info = _context.Shipments
                                                 .Include(s => s.ShipViaNavigation)
                                                 .Where(s => s.ShippedDate.Year == year
@@ -57,6 +67,73 @@ namespace WestWindSystem.BLL
                                                 .OrderBy(s => s.ShippedDate)
                                                 ;
             return info.ToList();
+        }
+
+        //this copy of the query is used for Pagination web page
+        public List<Shipment> Shipment_GetByYearAndMonthPaging(int year, 
+                                                                int month,
+                                                                int currentpagenumber,
+                                                                int itemsperpage)
+        {
+            //validate incoming values
+            if (year < 1950 || year > DateTime.Today.AddDays(1).Year)
+            {
+                throw new ArgumentException($"Your year value {year} is invalid. Year is between 1950 and today");
+            }
+            if (month < 1 || month > 12)
+            {
+                throw new ArgumentException($"Your month value {month} is invalid. Month is between 1 and 12");
+            }
+
+            //when using paging you must have your final ordered version of your query
+            IEnumerable<Shipment> info = _context.Shipments
+                                                .Include(s => s.ShipViaNavigation)
+                                                .Where(s => s.ShippedDate.Year == year
+                                                        && s.ShippedDate.Month == month)
+                                                .OrderBy(s => s.ShippedDate)
+                                                ;
+
+            //paging calculations
+            //caluclate the number of items to skip
+            //subtract 1 from the natural page number to get the page index number
+            int itemsSkipped = itemsperpage * (currentpagenumber - 1);
+
+            //Skip: skip the first x items representing previous pages
+            //Take: take up to the necessary number of items on a page
+
+            return info.Skip(itemsSkipped).Take(itemsperpage).ToList();
+        }
+
+        //return the total number of records found by the query
+        //this query will NOT return the actual records
+        public int Shipment_GetByYearAndMonthCount(int year,int month)
+        {
+            //validate incoming values
+            if (year < 1950 || year > DateTime.Today.AddDays(1).Year)
+            {
+                throw new ArgumentException($"Your year value {year} is invalid. Year is between 1950 and today");
+            }
+            if (month < 1 || month > 12)
+            {
+                throw new ArgumentException($"Your month value {month} is invalid. Month is between 1 and 12");
+            }
+
+            //when using paging you must have your final ordered version of your query
+            IEnumerable<Shipment> info = _context.Shipments
+                                                .Where(s => s.ShippedDate.Year == year
+                                                        && s.ShippedDate.Month == month);
+
+          
+            return info.Count();
+
+            //return _context.Shipments
+            //                .Where(s => s.ShippedDate.Year == year
+            //                        && s.ShippedDate.Month == month)
+            //                .Count();
+
+            //return _context.Shipments
+            //             .Count(s => s.ShippedDate.Year == year
+            //                     && s.ShippedDate.Month == month);
         }
         #endregion
     }
