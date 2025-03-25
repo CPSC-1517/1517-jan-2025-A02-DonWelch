@@ -1,18 +1,27 @@
-﻿@page "/productcrud"
+﻿@page "/productcrud/{productid:int?}"
+<!--
+    on the page directive above, a routing parameter has been add syntax: /routingname/{parametername:datatype}
+    this will allow an integer value to be passed to this page
+    the routing parameter (productid) needs to be declare in your code area below
+
+    if you have the situation where your receive page may or maynot receive a parameter
+        value THEN make the datatype nullable (?)
+-->
 @using WestWindSystem.Entities
 @using WestWindSystem.BLL
 
 
 <PageTitle>Product CRUD</PageTitle>
 
-<h3>Product CRUD</h3>
+<h1>Product CRUD</h1>
 
-@if (feedbackMessage != null)
+@if (feedBackMessage != null)
 {
     <div class="alert alert-info">
-        @feedbackMessage
+        @feedBackMessage
     </div>
 }
+
 
 <div>
    
@@ -20,14 +29,16 @@
 
 @code {
 
-  
-    public int? ProductId { get; set; }
+    private string? feedBackMessage;
 
-    private string? feedbackMessage;
-
-    // [Inject]
-    // private ProductServices _productServices { get; set; }
+    [Inject]
+    private ProductServices _productServices { get; set; }
     private Product CurrentProduct = new();
+
+    //declare your page routing parameter as a property
+    //this particular property needs an annotation indicating it is a Parameter
+    [Parameter]
+    public int? productid { get; set; }
 
     [Inject]
     private CategoryServices _categoryServices { get; set; }
@@ -38,8 +49,7 @@
     private SupplierServices _supplierServices { get; set; }
     private List<Supplier> suppliers = new();
 
-    // private int selectedSupplierId;
-
+   
     [Inject]
     protected NavigationManager CurrentNavigationManager { get; set; }
 
@@ -47,7 +57,7 @@
     {
         categories = _categoryServices.Categories_Get();
         suppliers = _supplierServices.Supplier_GetList();
-
+	base.OnInitialized();
       
     }
 
