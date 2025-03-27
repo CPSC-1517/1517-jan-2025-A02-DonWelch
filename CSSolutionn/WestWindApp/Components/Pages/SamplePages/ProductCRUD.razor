@@ -6,6 +6,8 @@
 
     if you have the situation where your receive page may or maynot receive a parameter
         value THEN make the datatype nullable (?)
+
+    if your routing parameter is a string, you do NOT need to specify the routing parameter datatype
 -->
 @using WestWindSystem.Entities
 @using WestWindSystem.BLL
@@ -24,7 +26,150 @@
 
 
 <div>
-   
+    <!-- EditForm this groups a bunch of controls as a single form
+                  allows for adding additonal option to integrate with your form controls
+                  contains a set of enhanced input controls
+
+        register an EditContext instance for this form
+
+         DataAnnotationsValidator   the DataAnnotationsValidator component is used within an
+                                    EditForm to enable validation based on data annotations
+                                    applied to model properties.
+
+         ValidationSummary displays a list of all validation errors
+                          show a summary of errors at the top of the form
+                          errors can be from model properties or custom messages
+                          this is optional
+
+         ValidationMessage displays the message associated with the indicated entity field
+                          this is optional
+
+        one
+    -->
+    <EditForm EditContext="editContext">
+        <DataAnnotationsValidator />
+        <ValidationSummary/>
+        <!--
+            the form controls will appear between the start and end EditForm tags
+
+            what about format layout
+                you can use your normal formatting (eg bootstrap) in laying out your form
+        -->
+        <div class="row">
+            <div class="offset-1 col-md-4">
+                <label for="productid" class="form-label">Product ID</label>
+                <!--
+                    We can use enhanced input type controls with EditForm
+                    No type is need for the EditForm control
+                    Binding parameter: bind-Value is required when using EditForm controls
+                -->
+                <InputNumber id="productid" class="form-control"
+                            @bind-Value="CurrentProduct.ProductID"
+                            style="width:75px;" readonly />
+                <br/>
+                <label for="productname" class="form-label">Name</label>
+                <InputText id="productname" class="form-control"
+                            @bind-Value="CurrentProduct.ProductName"
+                            placeholder="product name" />
+                <!--
+                    immediately after your input control you can add the validation
+                        message tag IF you want your messages immediately after the control
+
+                    you can omit this control and still display an error message associated
+                         with this control with the ValidationSummary
+                -->
+                <ValidationMessage For="@(() => CurrentProduct.ProductName)"/>
+                <br/>
+                <label for="supplierid" class="form-label">Supplier</label>
+                <InputSelect id="supplierid" class="form-control" 
+                                @bind-Value="CurrentProduct.SupplierID">
+                    <option value="0">... select ...</option>   
+                    @foreach(Supplier item in suppliers)
+                    {
+                        @*
+                        on this option the selected parameter is testing
+                        the current supplier id of the supplier list against
+                        the current supplier id of the current produce record
+
+                        if there is a match, the select line item will be the
+                        line item shown on the page
+                        *@
+                        <option value="@item.SupplierID"
+                                selected="@(item.SupplierID == CurrentProduct.SupplierID)">
+                            @item.CompanyName
+                        </option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => CurrentProduct.SupplierID)" />
+                <br />
+                <label for="categoryid" class="form-label">Category</label>
+                <InputSelect id="categoryid" class="form-control"
+                             @bind-Value="CurrentProduct.CategoryID">
+                    <option value="0">... select ...</option>
+                    @foreach (Category item in categories)
+                    {
+                        <option value="@item.CategoryID"
+                                selected="@(item.CategoryID == CurrentProduct.CategoryID)">
+                            @item.CategoryName
+                        </option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => CurrentProduct.CategoryID)" />
+            </div>
+            <div class="offset-1 col-md-4">
+                <label for="qtyperunit" class="form-label">Qty / Unit</label>
+                <InputText id="qtyperunit" class="form-control"
+                           @bind-Value="CurrentProduct.QuantityPerUnit"
+                           placeholder="qty per unit" />
+                <ValidationMessage For="@(() => CurrentProduct.QuantityPerUnit)" />
+                <br/>
+                <label for="unitprice" class="form-label">Unit Price</label>
+                <InputNumber id="unitprice" class="form-control"
+                             @bind-Value="CurrentProduct.UnitPrice"/>
+                <ValidationMessage For="@(() => CurrentProduct.UnitPrice)" />
+                <br />
+                <label for="minorderqty" class="form-label">Min Order Qty</label>
+                <InputNumber id="minorderqty" class="form-control"
+                             @bind-Value="CurrentProduct.MinimumOrderQuantity" />
+                <ValidationMessage For="@(() => CurrentProduct.MinimumOrderQuantity)" />
+                <br />
+                <label for="unitsonorder" class="form-label">Units on Order</label>
+                <InputNumber id="unitsonorder" class="form-control"
+                             @bind-Value="CurrentProduct.UnitsOnOrder" />
+                <ValidationMessage For="@(() => CurrentProduct.UnitsOnOrder)" />
+            </div>
+        </div>
+        <br/><br/>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-outline-primary rounded-pill"
+                        @onclick="OnCreate" style="width:110px;">
+                    Create
+                </button>
+                &nbsp;&nbsp;
+                 <button type="submit" class="btn btn-outline-primary rounded-pill"
+                        @onclick="OnUpdate" style="width:110px;">
+                    Update
+                </button>
+                &nbsp;&nbsp;
+                <button type="submit" class="btn btn-outline-primary rounded-pill"
+                        @onclick="OnDiscontinue" style="width:110px;">
+                    Discontinue
+                </button>
+                &nbsp;&nbsp;
+                <button type="submit" class="btn btn-outline-primary rounded-pill"
+                        @onclick="OnClear" style="width:110px;">
+                    Clear
+                </button>
+                &nbsp;&nbsp;
+                <button type="submit" class="btn btn-outline-primary rounded-pill"
+                        @onclick="GoToSearch" style="width:110px;">
+                    Search
+                </button>
+                
+            </div>
+        </div>
+    </EditForm>
 </div>
 
 @code {
@@ -49,16 +194,33 @@
     private SupplierServices _supplierServices { get; set; }
     private List<Supplier> suppliers = new();
 
-   
+
     [Inject]
     protected NavigationManager CurrentNavigationManager { get; set; }
 
+
+    //EditForm variables
+    //will hold the instance of the data that is being maintained on the contol
+    private EditContext editContext;
+    //will be used to place custom event validation messages into the same controls
+    //  used by DataAnnotationsValidator
+    private ValidationMessageStore validationMessageStore;
+
     protected override void OnInitialized()
     {
+        //create the EditContext instance AND tie to the instance of the entity of the form
+        editContext = new EditContext(CurrentProduct);
+
+        //create validation MessageStore instance and indicate which EditContext it is
+        //      associated with
+        //needed for custom validation within the event code and
+        //   allows the user to use the ValidationMesssage controls of the form
+        validationMessageStore = new ValidationMessageStore(editContext);
+
         categories = _categoryServices.Categories_Get();
         suppliers = _supplierServices.Supplier_GetList();
-	base.OnInitialized();
-      
+        base.OnInitialized();
+
     }
 
     private Exception GetInnerException(Exception ex)
@@ -66,5 +228,26 @@
         while (ex.InnerException != null)
             ex = ex.InnerException;
         return ex;
+    }
+
+    private void OnCreate()
+    {
+        
+    }
+    private void OnUpdate()
+    {
+
+    }
+    private void OnDiscontinue()
+    {
+
+    }
+    private void OnClear()
+    {
+
+    }
+    private void GoToSearch()
+    {
+
     }
 }
