@@ -45,5 +45,17 @@ namespace WestWindSystem.BLL
                                                 .OrderBy(x => x.ProductName);
             return info.ToList();
         }
+
+        public Product Product_GetByID(int productid)
+        {
+            Product info = _context.Products
+                                   .Where(x => x.ProductID == productid)
+                                   .FirstOrDefault();
+            return info;
+
+            //return _context.Products
+            //                       .Where(x => x.ProductID == productid)
+            //                       .FirstOrDefault();
+        }
     }
 }
