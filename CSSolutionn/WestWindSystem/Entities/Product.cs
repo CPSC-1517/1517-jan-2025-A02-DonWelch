@@ -26,7 +26,7 @@ public partial class Product
     //                                                      you could compute totalcost = price * quantity
     //                                             this field does not actually contain data and the entity
     //                                                 will not expected data to be supplied)
-    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
     public int ProductID { get; set; }
 
     [Required(ErrorMessage ="Product name is required. Cannot be blank.")]
