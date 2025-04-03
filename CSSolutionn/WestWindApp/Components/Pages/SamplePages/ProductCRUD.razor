@@ -161,10 +161,24 @@ a @formname attribute with any unique value, or pass a FormName parameter if usi
                     Update
                 </button>
                 &nbsp;&nbsp;
-                <button type="submit" class="btn btn-outline-primary rounded-pill"
-                @onclick="OnDiscontinue" style="width:160px;">
-                    Discontinue
-                </button>
+
+                <!-- determine which of the two following buttons to display-->
+                @if(CurrentProduct.Discontinued)
+                {
+                    <button type="submit" class="btn btn-outline-primary rounded-pill"
+                            @onclick="OnActivate" style="width:160px;">
+                        Activate
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-outline-primary rounded-pill"
+                            @onclick="OnDiscontinue" style="width:160px;">
+                        Discontinue
+                    </button>
+                }
+
+               
                 &nbsp;&nbsp;
                 <button type="submit" class="btn btn-outline-primary rounded-pill"
                 @onclick="OnClear" style="width:160px;">
@@ -343,6 +357,7 @@ a @formname attribute with any unique value, or pass a FormName parameter if usi
         }
 
     }
+    
     private void OnUpdate()
     {
         //clear old messages
@@ -406,10 +421,137 @@ a @formname attribute with any unique value, or pass a FormName parameter if usi
             feedBackMessage = $"System Error: {GetInnerException(ex).Message}";
         }
     }
+    
     private void OnDiscontinue()
     {
+        //in this demo, Product uses a logical delete
+        //clear old messages
+        feedBackMessage = "";
+        validationMessageStore.Clear();
+        try
+        {
+            //the first test is to check to see if there are ANY errors already caught
+            //  by the form using the DataAnnotationValidator?
+            if (editContext.Validate())
+            {
 
+                if (CurrentProduct.CategoryID == 0)
+                {
+                    validationMessageStore.Add(editContext.Field(nameof(CurrentProduct.CategoryID)),
+                                                "You must select a category");
+                }
+                if (CurrentProduct.SupplierID == 0)
+                {
+                    validationMessageStore.Add(editContext.Field(nameof(CurrentProduct.SupplierID)),
+                                               "You must select a supplier");
+                }
+
+                if (editContext.GetValidationMessages().Any())
+                {
+                    //notify  the editcontext that there has been a change to the message store
+                    editContext.NotifyValidationStateChanged();
+                }
+                else
+                {
+                    //the program assumes that the data is clean and can be further processed
+
+                    int rowsaffected = _productServices.Product_LogicalDelete(CurrentProduct);
+
+                    if (rowsaffected == 0)
+                    {
+                        feedBackMessage = $"Product {CurrentProduct.ProductName} (ID: {CurrentProduct.ProductID}) has not been discontinued. Check for product again";
+                    }
+                    else
+                    {
+                        feedBackMessage = $"Product {CurrentProduct.ProductName} (ID: {CurrentProduct.ProductID}) has been discontinued.";
+                    }
+
+                }
+            }
+        }
+        catch (ArgumentNullException ex)
+        {
+            //usually if an error occurs only ONE message will be executed
+            //You could setup a special error message string to display on your page
+            //  that is NOT the validationMessageStore and is NOT the feedBackMessage
+            //You could style this special error message string as an alert alert-danger
+            feedBackMessage = $"Missing Data: {GetInnerException(ex).Message}";
+        }
+        catch (ArgumentException ex)
+        {
+            feedBackMessage = $"Data Issue: {GetInnerException(ex).Message}";
+        }
+        catch (Exception ex)
+        {
+            feedBackMessage = $"System Error: {GetInnerException(ex).Message}";
+        }
     }
+    
+    private void OnActivate()
+    {
+        //in this demo, Product uses a logical delete
+        //clear old messages
+        feedBackMessage = "";
+        validationMessageStore.Clear();
+        try
+        {
+            //the first test is to check to see if there are ANY errors already caught
+            //  by the form using the DataAnnotationValidator?
+            // if (editContext.Validate())
+            // {
+
+            //     if (CurrentProduct.CategoryID == 0)
+            //     {
+            //         validationMessageStore.Add(editContext.Field(nameof(CurrentProduct.CategoryID)),
+            //                                     "You must select a category");
+            //     }
+            //     if (CurrentProduct.SupplierID == 0)
+            //     {
+            //         validationMessageStore.Add(editContext.Field(nameof(CurrentProduct.SupplierID)),
+            //                                    "You must select a supplier");
+            //     }
+
+            //     if (editContext.GetValidationMessages().Any())
+            //     {
+            //         //notify  the editcontext that there has been a change to the message store
+            //         editContext.NotifyValidationStateChanged();
+            //     }
+            //     else
+            //     {
+                    //the program assumes that the data is clean and can be further processed
+
+                    int rowsaffected = _productServices.Product_Activate(CurrentProduct);
+
+                    if (rowsaffected == 0)
+                    {
+                        feedBackMessage = $"Product {CurrentProduct.ProductName} (ID: {CurrentProduct.ProductID}) has not been activated. Check for product again";
+                    }
+                    else
+                    {
+                        feedBackMessage = $"Product {CurrentProduct.ProductName} (ID: {CurrentProduct.ProductID}) has been activated.";
+                    }
+
+                // }
+            //}
+        }
+        catch (ArgumentNullException ex)
+        {
+            //usually if an error occurs only ONE message will be executed
+            //You could setup a special error message string to display on your page
+            //  that is NOT the validationMessageStore and is NOT the feedBackMessage
+            //You could style this special error message string as an alert alert-danger
+            feedBackMessage = $"Missing Data: {GetInnerException(ex).Message}";
+        }
+        catch (ArgumentException ex)
+        {
+            feedBackMessage = $"Data Issue: {GetInnerException(ex).Message}";
+        }
+        catch (Exception ex)
+        {
+            feedBackMessage = $"System Error: {GetInnerException(ex).Message}";
+        }
+    }
+
     private async Task OnClear()
     {
         //clear out any old messages
@@ -431,6 +573,7 @@ a @formname attribute with any unique value, or pass a FormName parameter if usi
             editContext = new EditContext(CurrentProduct);
         }
     }
+   
     private async Task GoToSearch()
     {
         //clear out any old messages
