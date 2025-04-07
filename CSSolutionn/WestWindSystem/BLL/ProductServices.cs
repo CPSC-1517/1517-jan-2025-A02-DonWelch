@@ -345,7 +345,7 @@ namespace WestWindSystem.BLL
         }
 
 
-        public int Product_Activate(Product item)
+        public int Product_Activation(Product item)
         {
             //do any validation needed within the service
 
