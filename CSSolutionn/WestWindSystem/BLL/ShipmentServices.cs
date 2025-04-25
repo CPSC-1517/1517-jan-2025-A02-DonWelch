@@ -135,6 +135,10 @@ namespace WestWindSystem.BLL
             //             .Count(s => s.ShippedDate.Year == year
             //                     && s.ShippedDate.Month == month);
         }
+        public Shipment Shipment_GetByID(int shipmmentid)
+        {
+            return _context.Shipments.AsNoTracking().FirstOrDefault(s => s.ShipmentID == shipmmentid);
+        }
         #endregion
     }
 }

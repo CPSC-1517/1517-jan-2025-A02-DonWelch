@@ -1,0 +1,75 @@
+﻿@page "/shipmentdatetime"
+<PageTitle>Testing DateTime</PageTitle>
+@rendermode InteractiveServer
+
+@using WestWindSystem.BLL;
+@using WestWindSystem.Entities;
+@using Microsoft.AspNetCore.Components.Forms;
+
+
+<h3>Shipment DateTime Testing</h3>
+
+
+@if (!string.IsNullOrWhiteSpace(feedBackMessage))
+{
+    <div class="alert alert-info">
+        @feedBackMessage
+    </div>
+}
+
+<EditForm EditContext="editContext">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    @* InputDate only handles date portion of DateTime field *@
+    @* <label for="shipdate" class="form-label">Shipment Date</label>
+    <InputDate id="shipdate" class="form-control" @bind-Value="shipment.ShippedDate"/>
+    <br/> *@
+
+    @* this input control handles both the date and the time portion of a DateTime *@
+    <label for="shiptime" class="form-label">Shipment time</label>
+    <input type="datetime-local" @bind="shipment.ShippedDate" class="form-control"/>
+    <br />
+    <button type="submit" @onclick="testing">Testing</button>
+
+</EditForm>
+@code {
+    private string feedBackMessage = "";
+
+    [Inject]
+    private ShipmentServices _shipmentServices { get; set; }
+    private Shipment shipment = new Shipment();
+
+    EditContext editContext;
+
+    private DateTime testTime;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        shipment = _shipmentServices.Shipment_GetByID(1);
+        //testTime = shipment.ShippedDate;
+        editContext = new EditContext(shipment);
+    }
+
+    private void testing()
+    {
+        /*
+         * You can manually combine a DateTime field with the components of time from a
+         * secondary DateTime field
+         * 
+         * This examples takes the time from a secondary input control and combines that
+         * value with the shipment instance's ShippedDate value.
+        */
+
+
+        // feedBackMessage = $"Old value of ShippedDate is {shipment.ShippedDate} ";
+        // DateTime combined = shipment.ShippedDate
+        //     .AddHours(testTime.Hour)
+        //     .AddMinutes(testTime.Minute)
+        //     .AddSeconds(testTime.Second);
+
+        feedBackMessage += $" New value of ShippedDate is {shipment.ShippedDate} ";
+     
+    }
+}
